@@ -1,3 +1,8 @@
+# Check if Array can be Sorted
+
+___Referral Video Explanation (Not paid promotion)___:- [Find if Array Can Be Sorted - Leetcode 3011 - Python](https://www.youtube.com/watch?v=OpOPUeGFjxE)
+<hr>
+
 - ## Approach 1:- Bubble Sort 
 
     - ### **Intuition**
