@@ -7,7 +7,7 @@ __Companies:__ Edelweiss Group
 
 You are given a __0-indexed__ array of __positive__ integers `nums`.
 
-In one __operation__, you can swap any two __adjacent__ elements if they have the __same__ number of set bits (A set bit refers to a bit in the binary representation of a number that has a value of `1`.). You are allowed to do this operation __any__ number of times __(including zero)__.
+In one __operation__, you can swap any two __adjacent__ elements if they have the __same__ number of set bits (A set bit refers to a bit in the binary representation of a number that has a value of `1`). You are allowed to do this operation __any__ number of times __(including zero)__.
 
 Return `true` _if you can sort the array, else return_ `false`.
 <hr>
