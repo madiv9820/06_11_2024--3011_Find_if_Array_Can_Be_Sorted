@@ -3,7 +3,7 @@
 ___Referral Video Explanation (Not paid promotion)___ :- [Find if Array Can Be Sorted - Leetcode 3011 - Python](https://www.youtube.com/watch?v=OpOPUeGFjxE)
 <hr>
 
-- ## Approach 1:- Bubble Sort 
+- ## Approach 1 :- Bubble Sort 
 
     - ### **Intuition**
         The problem involves sorting an array of integers under the constraint that two adjacent elements can only be swapped if they have the same number of `1` bits (set bits) in their binary representation. The challenge is to determine if it is possible to sort the array given this restriction.
@@ -125,6 +125,128 @@ ___Referral Video Explanation (Not paid promotion)___ :- [Find if Array Can Be S
                         }
 
                         return true;  // If we successfully sorted the array (or determined it can be sorted), return true.
+                    }
+            };
+            ```
+
+- ## Approach 2 :- Segment-Based Validation
+
+    - ### Intuition:
+        - The problem asks whether the array can be sorted under a specific condition: numbers can only be swapped if they have the same number of `1`-bits (set bits) in their binary representation. The key observation is that the array can be sorted if and only if, for any contiguous segment of numbers with the same number of `1`-bits, the smallest number in the segment is greater than the largest number from the previous segment. This ensures that there are no "inversions" in the order of numbers with different bit-counts.
+
+    - ### Approach:
+        1. **Helper Function**: We define a helper function `count_Bits(val)` that computes the number of set bits (`1`-bits) in the binary representation of a number. This will help us group numbers with the same bit-count together.
+
+        2. **Segment Tracking**: As we iterate through the array, we track numbers that have the same number of set bits as the previous numbers, forming contiguous "segments" of numbers with the same bit-count. For each segment:
+            - Track the smallest (`current_min`) and largest (`current_max`) numbers.
+            - When the bit-count changes, check if the current segment's minimum number is greater than the maximum of the previous segment. If it isn't, we return `False`.
+        
+        3. **Final Check**: After iterating through all numbers, ensure that the last segment's minimum number is greater than the maximum number of the previous segment.
+
+        4. **Termination Condition**: If the above checks pass for all segments, the array can be sorted according to the given condition, so we return `True`.
+
+    - ### Time Complexity:
+        - **Helper Function**: The `count_Bits` function runs in constant time, as it processes a fixed number of bits (typically 32 bits for integers in most programming environments).
+        
+        - **Iteration**: We iterate through the entire list of `n` numbers, and for each number, we call `count_Bits` which runs in constant time. Therefore, the time complexity of the iteration is `O(n)`.
+
+        Thus, the overall time complexity is **O(n)**, where `n` is the number of elements in the input list.
+
+    - ### Space Complexity:
+        - **Auxiliary Space**: The space used by the algorithm is mainly for storing variables such as `current_min`, `current_max`, and `previous_max`, all of which take constant space.
+        
+        - **No Extra Data Structures**: The algorithm does not use any additional data structures that scale with the input size.
+
+        Thus, the space complexity is **O(1)** (constant space).
+
+    - ### Code
+        - **Python Solution**
+
+            ```python3
+            class Solution:
+                def canSortArray(self, nums: List[int]) -> bool:
+                    # Helper function to count the number of 1-bits (set bits) in the binary representation of a number.
+                    def count_Bits(val):
+                        # Convert the number to binary and count the number of '1's in its binary representation.
+                        return bin(val).count('1')
+                    
+                    # Initialize variables:
+                    # 'current_min' tracks the current smallest number with the same number of 1-bits.
+                    # 'current_max' tracks the largest number with the same number of 1-bits.
+                    current_min, current_max = nums[0], nums[0]
+                    
+                    # 'previous_max' keeps track of the maximum number encountered in the previous segment with the same number of 1-bits.
+                    previous_max = float('-inf')  # Set to negative infinity initially to ensure the first segment passes the comparison.
+
+                    # Iterate over each number in the list
+                    for num in nums:
+                        # If the current number has the same number of 1-bits as the current minimum number in the segment
+                        if count_Bits(num) == count_Bits(current_min):
+                            # Update 'current_min' to the smallest number and 'current_max' to the largest number in the current segment.
+                            current_min = min(current_min, num)
+                            current_max = max(current_max, num)
+                        else:
+                            # If we've reached a new segment (i.e., the number of 1-bits is different)
+                            # Check if the current minimum is still greater than the previous maximum.
+                            # If not, the array cannot be sorted under the given condition, so return False.
+                            if current_min < previous_max:
+                                return False
+
+                            # Update 'previous_max' to the current maximum (end of the previous segment)
+                            previous_max = current_max
+                            
+                            # Start a new segment with the current number as the new 'current_min' and 'current_max'
+                            current_min, current_max = num, num
+                    
+                    # After processing all numbers, the last segment should have 'current_min' greater than 'previous_max'.
+                    return current_min > previous_max
+            ```
+        
+        - **C++ Solution**
+            
+            ```C++ []
+            class Solution {
+                private:
+                    // Helper function to count the number of 1-bits (set bits) in the binary representation of a number.
+                    int countBits(int val) {
+                        // Use bitset to count the number of set bits (1s) in val.
+                        return bitset<32>(val).count();  // bitset<32> creates a fixed-size bitset for 32-bit integers.
+                    }
+                public:
+
+                    bool canSortArray(vector<int>& nums) {
+                        // Initialize variables:
+                        int current_min = nums[0];  // current minimum number in the segment
+                        int current_max = nums[0];  // current maximum number in the segment
+                        
+                        int previous_max = INT_MIN;  // previous maximum number from the last segment, initialized to negative infinity
+                        
+                        // Iterate over each number in the list
+                        for (int num : nums) {
+                            // If the current number has the same number of 1-bits as the current_min
+                            if (countBits(num) == countBits(current_min)) {
+                                // Update current_min to the smallest number and current_max to the largest number in the current segment.
+                                current_min = min(current_min, num);
+                                current_max = max(current_max, num);
+                            } else {
+                                // If we've reached a new segment (the number of 1-bits is different):
+                                // Check if the current minimum is still greater than the previous maximum.
+                                // If not, return false because we can't swap to sort the array.
+                                if (current_min < previous_max) {
+                                    return false;
+                                }
+
+                                // Update the previous_max to the current_max (end of the previous segment)
+                                previous_max = current_max;
+                                
+                                // Start a new segment with the current number as the new current_min and current_max
+                                current_min = num;
+                                current_max = num;
+                            }
+                        }
+
+                        // After processing all numbers, ensure the last segment can be placed after the previous one.
+                        return current_min > previous_max;
                     }
             };
             ```
