@@ -1,6 +1,7 @@
 #include <vector>
 #include <bitset>
 #include <algorithm>
+#include <climits>
 #include <iostream>
 using namespace std;
 
@@ -8,40 +9,44 @@ class Solution {
     private:
         // Helper function to count the number of 1-bits (set bits) in the binary representation of a number.
         int countBits(int val) {
-            return bitset<32>(val).count();  // Use bitset to count the number of set bits (1s) in val.
+            // Use bitset to count the number of set bits (1s) in val.
+            return bitset<32>(val).count();  // bitset<32> creates a fixed-size bitset for 32-bit integers.
         }
-
     public:
-        bool canSortArray(vector<int>& nums) {
-            int n = nums.size();  // Length of the input array 'nums'
-            vector<int> arr = nums;  // Make a copy of the original array to work with
 
-            // Traverse the array from the beginning, simulating a bubble sort.
-            for (int currentIndex = 0; currentIndex < n; ++currentIndex) {
-                bool isAlreadySorted = true;  // Flag to check if the array is already sorted at this point.
-                
-                // Perform a modified bubble sort where we compare adjacent elements.
-                for (int i = 0; i < n - 1 - currentIndex; ++i) {  
-                    // If the current element is greater than the next element, we need to swap them.
-                    if (arr[i] > arr[i + 1]) {
-                        // But we can only swap if both numbers have the same number of 1-bits in their binary form.
-                        if (countBits(arr[i]) == countBits(arr[i + 1])) {
-                            swap(arr[i], arr[i + 1]);  // Swap the elements
-                            isAlreadySorted = false;  // Since we swapped, the array is not sorted yet.
-                        } else {
-                            // If they have different numbers of 1-bits, we cannot swap them, so return false.
-                            return false;
-                        }
+        bool canSortArray(vector<int>& nums) {
+            // Initialize variables:
+            int current_min = nums[0];  // current minimum number in the segment
+            int current_max = nums[0];  // current maximum number in the segment
+            
+            int previous_max = INT_MIN;  // previous maximum number from the last segment, initialized to negative infinity
+            
+            // Iterate over each number in the list
+            for (int num : nums) {
+                // If the current number has the same number of 1-bits as the current_min
+                if (countBits(num) == countBits(current_min)) {
+                    // Update current_min to the smallest number and current_max to the largest number in the current segment.
+                    current_min = min(current_min, num);
+                    current_max = max(current_max, num);
+                } else {
+                    // If we've reached a new segment (the number of 1-bits is different):
+                    // Check if the current minimum is still greater than the previous maximum.
+                    // If not, return false because we can't swap to sort the array.
+                    if (current_min < previous_max) {
+                        return false;
                     }
-                }
-                
-                // If no swaps were made in this iteration, the array is already sorted.
-                if (isAlreadySorted) {
-                    break;
+
+                    // Update the previous_max to the current_max (end of the previous segment)
+                    previous_max = current_max;
+                    
+                    // Start a new segment with the current number as the new current_min and current_max
+                    current_min = num;
+                    current_max = num;
                 }
             }
 
-            return true;  // If we successfully sorted the array (or determined it can be sorted), return true.
+            // After processing all numbers, ensure the last segment can be placed after the previous one.
+            return current_min > previous_max;
         }
 };
 
